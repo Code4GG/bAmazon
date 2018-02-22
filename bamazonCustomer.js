@@ -18,8 +18,7 @@ connection.connect(function(err) {
   runStart();
 });	
 		
-		// const query = "SELECT * FROM products";
-		// let stock = connection.query(query, function(err,))
+
 
 	function runStart(){
 		console.log("Welcome to bAmazon these are our items for sale")
@@ -58,6 +57,9 @@ connection.connect(function(err) {
 				let id = answer.idq;
 				let correctId = parseFloat(id - 1);
 				let userQuantity = answer.stockq;
+				let numberQuant = parseFloat(userQuantity);
+
+
 
 			const query = "SELECT * FROM products";
 
@@ -65,35 +67,52 @@ connection.connect(function(err) {
 					if (err) throw err;
 					
 					const currentStock = res[correctId].stock_quantity - userQuantity;
+					const totalPrice = numberQuant * res[correctId].price;
 
 					console.log(currentStock);
-					console.log(userQuantity);
+					console.log("Your purchase will cost: $" + totalPrice + ".00");
 
-					const queryTwo = "UPDATE products SET stock_quantity =" + connection.escape(currentStock) + "WHERE item_id =" + connection.escape(id);
-						connection.query(queryTwo, function(err, res){
+					if (currentStock === 0){
+						currentStock === 0;
+						console.log("Insufficient quantity!");
+						connection.end();
+					} else {
+
+						connection.query("UPDATE products SET ? WHERE ?",
+						[
+						 {
+							stock_quantity: currentStock
+						 },
+						 {
+							item_id: id
+						 }
+						], function(err, res){
 							if (err) throw err;
 
 							console.log("DB UPDATEd");
-							connection.end();
 						})
-
-					
+					}
+					yesno();
 				})
-				// update();
-				// connection.end();
-			}) 	
+			
+			}) 
 	}
 
-	
-	//connection.query("UPDATE products SET ? WHERE ?")
-
-	// SELECT SUM (stock_quantity) FROM products
-
-	//if (stock_quantity <= 0){
-	// 	console.log("Insufficient quantity!");
-	// }
-
-	// .then(function(answer){
-	// 	console.log(res.stock_quantity - answer.stockq)
-	// })
+	function yesno(){
+		inquirer
+			.prompt({
+		      name: "continue",
+		      type: "rawlist",
+		      message: "Would you like to purchase anything else?",
+		      choices: ["YES", "NO"]
+		    })
+		    .then(function(answer){
+		    	if (answer.continue.toUpperCase() === "Yes"){
+		    		runStart();
+		    	} else{
+		    		console.log("Thanks for shopping!");
+		    		connection.end();
+		    	}
+		    })
+	}
 	
