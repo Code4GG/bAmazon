@@ -1,6 +1,6 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
-
+//connection to server
 const connection = mysql.createConnection({
   host: "localhost",
   port: 8889,
@@ -12,14 +12,14 @@ const connection = mysql.createConnection({
   password: "root",
   database: "bAmazon"
 });
-
+//connecting to server and running first function
 connection.connect(function(err) {
   if (err) throw err;
   runStart();
 });	
 		
 
-
+//will show the user a welcome message with all products in store
 	function runStart(){
 		console.log("Welcome to bAmazon these are our items for sale")
 		const query = "SELECT * FROM products";
@@ -65,19 +65,16 @@ connection.connect(function(err) {
 
 				connection.query(query, function(err, res){
 					if (err) throw err;
-					
+					//current stock reduces the amount the user put in compared to the current
 					const currentStock = res[correctId].stock_quantity - userQuantity;
 					const totalPrice = numberQuant * res[correctId].price;
 
-					console.log(currentStock);
-					console.log("Your purchase will cost: $" + totalPrice + ".00");
-
-					if (currentStock === 0){
+					if (res[correctId].stock_quantity < numberQuant){
 						currentStock === 0;
 						console.log("Insufficient quantity!");
 						connection.end();
 					} else {
-
+						//updates the database to current stock at the product it was bought at
 						connection.query("UPDATE products SET ? WHERE ?",
 						[
 						 {
@@ -89,25 +86,26 @@ connection.connect(function(err) {
 						], function(err, res){
 							if (err) throw err;
 
-							console.log("DB UPDATEd");
+							// console.log("DB UPDATEd");
+							console.log("Your purchase will cost: $" + totalPrice + ".00");
+							yesno();
+
 						})
 					}
-					yesno();
 				})
-			
 			}) 
 	}
-
+//asks if the user wants to buy more items
 	function yesno(){
 		inquirer
 			.prompt({
 		      name: "continue",
-		      type: "rawlist",
+		      type: "list",
 		      message: "Would you like to purchase anything else?",
 		      choices: ["YES", "NO"]
 		    })
 		    .then(function(answer){
-		    	if (answer.continue.toUpperCase() === "Yes"){
+		    	if (answer.continue === "YES"){
 		    		runStart();
 		    	} else{
 		    		console.log("Thanks for shopping!");
