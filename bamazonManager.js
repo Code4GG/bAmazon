@@ -168,7 +168,7 @@ connection.connect(function(err) {
 			.then(function(answer){
 				let prices = parseFloat(answer.price);
 			
-				let values = [[answer.product, answer.department, prices, answer.stock_quantity]];
+				let values = [[answer.product, answer.department, prices, answer.stock]];
 				connection.query("INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES ?",[values], function(err, res){
 					if (err) throw err;
 					console.log("Database Updated!");
