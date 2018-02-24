@@ -69,6 +69,17 @@ connection.connect(function(err) {
 					const currentStock = res[correctId].stock_quantity - userQuantity;
 					const totalPrice = numberQuant * res[correctId].price;
 
+					connection.query("UPDATE products SET ? WHERE ?", [
+						{
+							product_sales: totalPrice
+						},
+						{
+							item_id: id
+						}
+						], function(err,res){
+						if (err) throw err;
+					});
+
 					if (res[correctId].stock_quantity < numberQuant){
 						currentStock === 0;
 						console.log("Insufficient quantity!");
