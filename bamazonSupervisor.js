@@ -47,12 +47,14 @@ connection.connect(function(err) {
 	}
 
 	function viewProducts(){
-
-		const query = "SELECT departments.*, SUM(products.product_sales) FROM products LEFT JOIN departments on products.department_name = departments.department_name GROUP BY department_id";
+		
+		const query = `SELECT departments.*, SUM(product_sales) FROM products LEFT JOIN departments on products.department_name = departments.department_name GROUP BY department_id`;
 		
 		connection.query(query, function(err, res){
-				console.log(res);
-				let table = cTable.getTable(res,[{test: 'test'}]);
+				// I couldnt figure out how to add an extra column to the table
+				//along with not being able to calculate the product_sales - over_head_cost
+				//properly so this is what i concluded with 
+				let table = cTable.getTable(res,[{TotalProfit: 'totalProfit'}]);
 				console.log(table);
 			
 			connection.end();
